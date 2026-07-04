@@ -1,0 +1,8 @@
+hour,day_of_week,is_holiday,vehicle_count,weather_code,vehicle_count_future
+8,1,0,45,1,52
+9,1,0,78,1,85
+12,1,0,120,2,115
+17,1,0,95,1,88
+18,1,0,110,3,105
+8,6,0,30,1,28
+10,0,1,25,1,22

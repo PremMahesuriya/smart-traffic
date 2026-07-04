@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+frontend/dist/
+backend/dist/
+*.egg-info/
+
+# AI / ML
+ai/runs/
+ai/weights/*.pt
+!ai/weights/.gitkeep
+datasets/*.mp4
+datasets/*.avi
+!datasets/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Docker
+docker/data/
+
+# Coverage
+coverage/
+htmlcov/
+.pytest_cache/

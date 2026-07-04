@@ -1,0 +1,25 @@
+{
+  "folders": [
+    { "name": "Root", "path": "." },
+    { "name": "AI", "path": "ai" },
+    { "name": "Backend", "path": "backend" },
+    { "name": "Frontend", "path": "frontend" }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder:AI}/venv/Scripts/python.exe",
+    "python.analysis.extraPaths": ["${workspaceFolder:AI}"],
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/__pycache__": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "mongodb.mongodb-vscode"
+    ]
+  }
+}

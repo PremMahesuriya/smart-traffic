@@ -1,0 +1,133 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: #1e293b;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid #334155;
+}
+
+.logo {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: #38bdf8;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card,
+.camera-card,
+.signal-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.stat-title {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.light {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.light.green { color: #22c55e; }
+.light.red { color: #ef4444; }
+.light.yellow { color: #eab308; }
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.badge.online { background: #166534; color: #bbf7d0; }
+.badge.offline { background: #7f1d1d; color: #fecaca; }
+
+.empty {
+  color: #64748b;
+  padding: 2rem;
+  text-align: center;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+.chart-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #334155;
+}
+
+.chart-container h3 {
+  margin-bottom: 1rem;
+}
