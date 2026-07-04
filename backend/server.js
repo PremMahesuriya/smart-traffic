@@ -5,6 +5,7 @@ import { connectDB } from './config/database.js';
 import { requestLogger, logger } from './utils/logger.js';
 import trafficRoutes from './routes/trafficRoutes.js';
 import signalRoutes from './routes/signalRoutes.js';
+import internalRoutes from './routes/internalRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.get('/api/health', (req, res) => {
 // REST API Route mapping
 app.use('/api/traffic', trafficRoutes);
 app.use('/api/signals', signalRoutes);
+app.use('/api/internal', internalRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

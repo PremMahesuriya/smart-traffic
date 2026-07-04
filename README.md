@@ -1,112 +1,122 @@
 # Smart Traffic Management System
 
-An AI-powered traffic management platform that detects vehicles, calculates lane density, adapts signal timing, prioritizes emergency vehicles, detects accidents, and predicts traffic patterns — with a real-time React dashboard.
+An end-to-end, real-time smart traffic signal controller and dashboard. The system tracks vehicle crossings, classifies lane density queues using YOLOv8 and ByteTrack, runs a starvation-preventative signal timing scheduler (Priority Ageing), logs metrics, and serves traffic stats via an Express REST API backend to a React Web Dashboard.
 
-## Tech Stack
+---
 
-| Layer | Technologies |
-|-------|-------------|
-| AI / CV | Python, OpenCV, YOLO, scikit-learn |
-| Backend | Node.js, Express, JWT |
-| Frontend | React, Chart.js |
-| Database | MongoDB |
-| DevOps | Docker, Git |
+## 1. System Architecture
 
-## Project Structure
-
-```
-smart-traffic-management/
-├── frontend/          React dashboard
-├── backend/           Node.js + Express REST API
-├── ai/
-│   ├── vehicle_detection/
-│   ├── lane_detection/
-│   ├── accident_detection/
-│   └── traffic_prediction/
-├── database/          Schemas & seed scripts
-├── datasets/          Training / test videos
-├── docs/              Requirements & architecture
-├── docker/            Container configs
-└── README.md
+```mermaid
+graph TD
+  Video[Traffic Video Source] --> Pipeline[ai/main.py Orchestrator]
+  Pipeline --> YOLO[YOLOv8 Detection]
+  YOLO --> Tracker[ByteTrack ID Assignment]
+  Tracker --> Lanes[Lane Segment Centroid Mapping]
+  Lanes --> Signal[Adaptive Signal Score Calculation]
+  Signal --> Telemetry[JSON State Packing & HW Profiling]
+  Telemetry --> POST[POST updateTraffic API Call]
+  POST --> Backend[Node/Express REST Server]
+  Backend --> DB[(MongoDB Database)]
+  DB --> GET[REST Endpoints]
+  GET --> Dashboard[React Web Dashboard UI]
 ```
 
-## Roadmap
+---
 
-| Phase | Duration | Focus |
-|-------|----------|-------|
-| 0 | 1 week | Prerequisites (Python, OpenCV, React, Node, MongoDB) |
-| 1 | 1 week | Problem research → requirements document |
-| 2 | 2–3 weeks | Vehicle detection & counting |
-| 3 | 1 week | Lane detection & per-lane counts |
-| 4 | 1 week | Traffic density calculation |
-| 5 | 2 weeks | Adaptive signal algorithm |
-| 6 | 2 weeks | Emergency vehicle detection |
-| 7 | 2 weeks | Accident detection & alerts |
-| 8 | 2 weeks | Traffic prediction (ML models) |
-| 9 | 2 weeks | Backend REST APIs |
-| 10 | 1 week | MongoDB collections |
-| 11 | 3 weeks | React dashboard |
-| 12 | Optional | Maps integration |
-| 13 | — | JWT authentication & RBAC |
-| 14 | — | Email / SMS / push notifications |
-| 15 | — | Docker deployment |
+## 2. Folder Structure
 
-## Quick Start
+```
+Project Root/
+├── ai/                      # AI Computer Vision Pipeline
+│     ├── main.py            # Main Orchestrator and API poster
+│     ├── vehicle_detection/ # YOLOv8 Tracker modules (Phase 2)
+│     ├── lane_detection/    # Lane polygons segmentation (Phase 3)
+│     ├── signal_control/    # Scheduling controller (Phase 4)
+│     ├── Dockerfile         # Python service container config
+│     └── requirements.txt   # Python packages checklist
+├── backend/                 # Node.js Express REST API (Phase 5)
+│     ├── server.js          # App entrypoint and listener
+│     ├── controllers/       # Route handlers
+│     ├── models/            # Mongoose MongoDB schemas
+│     ├── routes/            # REST endpoint paths
+│     ├── services/          # CSV seeder importer service
+│     └── Dockerfile         # Backend container config
+├── frontend/                # React Vite Dashboard UI (Phase 6)
+│     ├── src/               # React pages, components, services, and styles
+│     └── Dockerfile         # Production Nginx frontend builder
+├── docs/                    # Requirements documents
+├── output/                  # Stored benchmark logs and annotated videos (Git ignored)
+├── docker-compose.yml       # Orchestrates MongoDB, API, Frontend, and AI services
+├── run_pipeline.py          # Unified system diagnostics test script
+├── LICENSE                  # MIT License details
+└── CONTRIBUTING.md          # Open-source contributing guidelines
+```
 
-### Prerequisites
+---
 
-- Python 3.10+
-- Node.js 18+
-- MongoDB 6+
-- Docker (optional)
+## 3. Technology Stack
 
-### AI Module
+- **AI/ML**: Python 3.10, PyTorch, Ultralytics YOLOv8, ByteTrack, OpenCV, psutil.
+- **Backend API**: Node.js, Express.js, MongoDB, Mongoose, Axios.
+- **Frontend UI**: React, Vite, React Router, Recharts, Custom CSS.
+- **Deployment**: Docker, Docker Compose, Nginx.
 
+---
+
+## 4. API Reference Documentation
+
+### Core Client Endpoints
+- `GET /api/traffic/current`: Latest vehicles counts and densities per lane.
+- `GET /api/traffic/history`: History of traffic logs.
+- `GET /api/traffic/analytics`: Calculated busiest lane, average traffic, and total vehicles.
+- `GET /api/signals/current`: Green light lane, active color state, and remaining countdown.
+- `GET /api/signals/history`: Chronological transition log of light switches.
+- `GET /api/health`: Express API connection status and MongoDB connectivity health check.
+
+### Internal Write Endpoint
+- `POST /api/internal/updateTraffic`: Direct JSON payload gateway for pipeline frame telemetry.
+
+---
+
+## 5. How to Run Locally
+
+### 1. Prerequisites
+- Install **Node.js** (v18+) and **Python** (v3.10+).
+- Ensure **MongoDB** is running locally at `mongodb://localhost:27017/`.
+
+### 2. Configure Environment
+Create `.env` inside `backend/` and `frontend/` folders matching their respective `.env.example` templates.
+
+### 3. Run Setup & Diagnostics
+Verify that all packages and local network systems pass tests:
 ```bash
-cd ai
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
-
-pip install -r requirements.txt
-python vehicle_detection/detect.py --video ../datasets/sample_traffic.mp4
+python run_pipeline.py
 ```
 
-### Backend
+### 4. Startup Components
+- **Backend Server**:
+  ```bash
+  cd backend
+  node server.js
+  ```
+- **Frontend Dashboard**:
+  ```bash
+  cd frontend
+  node node_modules/vite/bin/vite.js
+  ```
+- **AI Pipeline**:
+  ```bash
+  cd ai
+  python main.py --video datasets/day.mp4
+  ```
 
+---
+
+## 6. Docker Deployment (Recommended)
+
+To deploy the entire system (Database, REST Server, React Dashboard, and AI loop) with a single command:
 ```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
+docker compose up --build
 ```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Docker (all services)
-
-```bash
-docker compose -f docker/docker-compose.yml up --build
-```
-
-## API Endpoints
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| GET | `/api/traffic` | Current traffic data |
-| GET | `/api/camera` | Camera feeds & status |
-| GET | `/api/signals` | Signal states |
-| POST | `/api/signal` | Update signal timing |
-| GET | `/api/analytics` | Historical analytics |
-
-## Skills Demonstrated
-
-Python · OpenCV · AI/ML · Computer Vision · React · Node.js · Express · MongoDB · REST API · Docker · Git · System Design · Real-time Data Processing
+- **React Dashboard UI** will be active at `http://localhost/` (Port 80).
+- **Express Backend API** will be active at `http://localhost:5000/`.
