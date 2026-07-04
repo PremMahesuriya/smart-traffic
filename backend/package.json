@@ -2,11 +2,12 @@
   "name": "smart-traffic-backend",
   "version": "1.0.0",
   "description": "REST API for Smart Traffic Management System",
-  "main": "src/index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "import": "node services/csvImporter.js",
     "seed": "node database/seed.js"
   },
   "dependencies": {

@@ -1,9 +1,8 @@
-export default function StatCard({ title, value, subtitle }) {
+export default function StatCard({ title, value, color }) {
   return (
-    <div className="stat-card">
-      <p className="stat-title">{title}</p>
-      <p className="stat-value">{value}</p>
-      {subtitle && <p className="stat-subtitle">{subtitle}</p>}
+    <div className="card stat-card" style={{ borderLeft: color ? `4px solid ${color}` : undefined }}>
+      <span className="stat-title">{title}</span>
+      <span className="stat-value">{value}</span>
     </div>
   );
 }

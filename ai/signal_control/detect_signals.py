@@ -1,4 +1,4 @@
-"""Lane detection and per-lane vehicle counting orchestrator CLI."""
+"""Adaptive signal controller and density classification CLI orchestrator."""
 
 import argparse
 import logging
@@ -28,142 +28,31 @@ from vehicle_detection.config import (
 )
 from vehicle_detection.detector import VehicleDetector
 from vehicle_detection.tracker import VehicleTracker
-from lane_detection.config import LANE_COLORS
 from lane_detection.lane_detector import LaneDetector
 from lane_detection.lane_manager import LaneManager
+from signal_control.config import SIGNAL_TIMINGS
+from signal_control.density import classify_density
+from signal_control.signal_controller import AdaptiveSignalController
+from signal_control.utils import draw_signal_hud, export_signal_history_to_csv
 
-# Configure logging
+# Setup logger
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)]
 )
-logger = logging.getLogger("smart_traffic.lane_detect")
+logger = logging.getLogger("smart_traffic.signal_detect")
 
 
-def draw_lane_hud(frame, live_counts: dict[str, int], cumulative_counts: dict[str, int], fps: float, inference_ms: float):
-    """Draw a professional HUD panel listing live & cumulative counts per lane."""
-    h, w = frame.shape[:2]
-
-    # Semi-transparent background overlay for the lane dashboard HUD (top right)
-    hud_w = 260
-    hud_h = 160
-    overlay = frame.copy()
-    cv2.rectangle(overlay, (w - 10 - hud_w, 10), (w - 10, 10 + hud_h), (30, 30, 30), -1)
-    # Blend overlay (alpha = 0.75)
-    cv2.addWeighted(overlay, 0.75, frame, 0.25, 0, frame)
-
-    # Header
-    cv2.putText(
-        frame,
-        "LANE MONITORING",
-        (w - hud_w, 32),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        2,
-        cv2.LINE_AA
-    )
-    cv2.line(frame, (w - hud_w, 38), (w - 20, 38), (100, 100, 100), 1)
-
-    y_offset = 58
-    for name in ["A", "B", "C", "D"]:
-        color = LANE_COLORS.get(name, (120, 120, 120))
-        live = live_counts.get(name, 0)
-        cum = cumulative_counts.get(name, 0)
-
-        # Draw a small color badge next to the lane name
-        cv2.rectangle(frame, (w - hud_w, y_offset - 10), (w - hud_w + 12, y_offset + 2), color, -1)
-        cv2.rectangle(frame, (w - hud_w, y_offset - 10), (w - hud_w + 12, y_offset + 2), (255, 255, 255), 1)
-
-        # Draw counts
-        cv2.putText(
-            frame,
-            f"Lane {name}: Live {live} | Total {cum}",
-            (w - hud_w + 22, y_offset),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (255, 255, 255),
-            1,
-            cv2.LINE_AA
-        )
-        y_offset += 22
-
-    # Draw stats bottom left
-    perf_w = 180
-    perf_h = 55
-    overlay_perf = frame.copy()
-    cv2.rectangle(overlay_perf, (10, h - 10 - perf_h), (10 + perf_w, h - 10), (30, 30, 30), -1)
-    cv2.addWeighted(overlay_perf, 0.7, frame, 0.3, 0, frame)
-
-    cv2.putText(
-        frame,
-        f"FPS: {fps:.1f}",
-        (20, h - 42),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.5,
-        (0, 255, 0),
-        1,
-        cv2.LINE_AA
-    )
-    cv2.putText(
-        frame,
-        f"Inference: {inference_ms:.1f} ms",
-        (20, h - 22),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.5,
-        (255, 255, 0),
-        1,
-        cv2.LINE_AA
-    )
-
-
-def draw_vehicle_tags_with_lanes(frame, tracks: list[dict]):
-    """Draw bounding boxes and tag details containing Lane mappings and confidence scores."""
-    from shared.constants import CLASS_DISPLAY, VEHICLE_CLASSES
-    from vehicle_detection.utils import CLASS_COLORS
-
-    for track in tracks:
-        bbox = track["bbox"]
-        track_id = track["id"]
-        cls_id = track["cls"]
-        conf = track["conf"]
-        lane = track.get("lane", None)
-
-        cls_name = VEHICLE_CLASSES.get(cls_id, "unknown")
-        color = CLASS_COLORS.get(cls_name, CLASS_COLORS["unknown"])
-        display_name = CLASS_DISPLAY.get(cls_name, cls_name.capitalize())
-
-        x1, y1, x2, y2 = map(int, bbox)
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-
-        # Draw vehicle label with assigned lane
-        lane_label = f" | Lane {lane}" if lane else ""
-        label = f"{display_name} #{track_id}{lane_label} [Conf: {conf:.2f}]"
-
-        (label_w, label_h), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
-        cv2.rectangle(frame, (x1, y1 - label_h - 10), (x1 + label_w + 10, y1), color, -1)
-        cv2.putText(
-            frame,
-            label,
-            (x1 + 5, y1 - 5),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.4,
-            (255, 255, 255) if sum(color) < 400 else (0, 0, 0),
-            1,
-            cv2.LINE_AA
-        )
-
-
-def run_lane_pipeline(
+def run_signal_pipeline(
     video_path: str,
     model_path: str = DEFAULT_MODEL,
     show: bool = False,
     save: bool = False,
     export_csv: bool = False
 ):
-    """Run the integrated tracking + lane counting pipeline."""
-    logger.info("Initializing integrated Lane Counting pipeline...")
+    """Run integrated vehicle tracking + lane segmentation + adaptive signal pipeline."""
+    logger.info("Initializing integrated Adaptive Signal Control pipeline...")
 
     video_source = video_path
     if video_path.isdigit():
@@ -195,10 +84,8 @@ def run_lane_pipeline(
         fps_src = 30.0
 
     # Initialize Lane Components
-    # Polygons are auto-defined for 640x360. If camera resolution differs, we adapt.
     lane_polygons = None
     if width != 640 or height != 360:
-        # Scale default vertical subdivisions to match resolution dynamically
         w_step = width // 4
         lane_polygons = {
             "A": [(0, 0), (w_step, 0), (w_step, height), (0, height)],
@@ -209,12 +96,13 @@ def run_lane_pipeline(
 
     lane_detector = LaneDetector(lane_polygons)
     lane_manager = LaneManager(["A", "B", "C", "D"])
+    signal_controller = AdaptiveSignalController(["A", "B", "C", "D"])
 
     # Setup Video Writer
     out_writer = None
     if save:
         video_name = "live_stream" if isinstance(video_source, int) else Path(video_path).stem
-        out_video_path = OUTPUT_DIR / f"{video_name}_lanes_annotated.mp4"
+        out_video_path = OUTPUT_DIR / f"{video_name}_signals_annotated.mp4"
         logger.info(f"Saving annotated video to: {out_video_path}")
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         out_writer = cv2.VideoWriter(str(out_video_path), fourcc, fps_src, (width, height))
@@ -226,6 +114,9 @@ def run_lane_pipeline(
     prev_frame_time = time.time()
     fps_display = 0.0
 
+    # History buffer for CSV export
+    signal_history = []
+
     try:
         while cap.isOpened():
             ret, frame = cap.read()
@@ -234,6 +125,7 @@ def run_lane_pipeline(
 
             frame_count += 1
             timestamp_sec = frame_count / fps_src
+            elapsed_frame_time = 1.0 / fps_src
 
             curr_frame_time = time.time()
             time_diff = curr_frame_time - prev_frame_time
@@ -252,16 +144,42 @@ def run_lane_pipeline(
             inf_time_ms = (inf_end - inf_start) * 1000.0
             total_inf_time += inf_time_ms
 
-            # Map tracking boxes to lanes and record metrics
+            # Map tracking boxes to lanes
             lane_manager.update(tracks, lane_detector, frame_count, timestamp_sec)
+            lane_counts = lane_manager.get_live_counts()
 
-            # Visual overlays (lanes, tracks, HUD metrics)
+            # Update Adaptive Signal controller state
+            signal_controller.update(lane_counts, elapsed_frame_time)
+
+            # Record metrics for all lanes in history buffer
+            for lane in ["A", "B", "C", "D"]:
+                count = lane_counts.get(lane, 0)
+                density = classify_density(count)
+
+                # Determine status and dynamic time
+                status = "RED"
+                assigned_green = 0
+                if lane == signal_controller.current_green_lane:
+                    status = signal_controller.signal_state.upper()
+                    assigned_green = signal_controller.get_green_duration(count)
+
+                signal_history.append({
+                    "timestamp": timestamp_sec,
+                    "lane": lane,
+                    "count": count,
+                    "density": density,
+                    "assigned_green_time": assigned_green,
+                    "status": status,
+                })
+
+            # Render visuals
             lane_detector.draw_lanes(frame)
+            from lane_detection.detect_lanes import draw_vehicle_tags_with_lanes
             draw_vehicle_tags_with_lanes(frame, tracks)
-            draw_lane_hud(
+            draw_signal_hud(
                 frame,
-                lane_manager.get_live_counts(),
-                lane_manager.get_cumulative_counts(),
+                lane_counts,
+                signal_controller,
                 fps_display,
                 inf_time_ms
             )
@@ -272,7 +190,7 @@ def run_lane_pipeline(
 
             # Live preview screen
             if show:
-                cv2.imshow("Smart Traffic Management - Phase 3 (Lanes)", frame)
+                cv2.imshow("Smart Traffic Management - Phase 4 (Signals)", frame)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     logger.info("Video preview stopped by user.")
                     break
@@ -292,42 +210,43 @@ def run_lane_pipeline(
     avg_fps = frame_count / total_time if total_time > 0 else 0
     avg_inf = total_inf_time / frame_count if frame_count > 0 else 0
 
-    # Output stats to console
-    print("\n--- Final Per-Lane Counts ---")
-    cum_counts = lane_manager.get_cumulative_counts()
-    for name in ["A", "B", "C", "D"]:
-        print(f"Lane {name}: {cum_counts.get(name, 0)}")
+    print("\n--- Final Controller State ---")
+    print(f"Current Active Lane: {signal_controller.current_green_lane or 'None'}")
+    print(f"Current Signal State: {signal_controller.signal_state.upper()}")
+    print(f"Remaining Countdown: {signal_controller.timer_countdown:.1f}s")
+    print(f"Starvation Cycle Wait Counts: {dict(signal_controller.cycles_waiting)}")
 
     print("\n--- Performance Metrics ---")
     print(f"Total Frames: {frame_count}")
     print(f"Total Execution Time: {total_time:.2f} s")
     print(f"Average FPS: {avg_fps:.1f}")
-    print(f"Average Inference Latency: {avg_inf:.1f} ms")
+    print(f"Average Processing Latency: {avg_inf:.1f} ms")
 
-    # Save to CSV
-    if export_csv:
+    # Save CSV
+    if export_csv and signal_history:
         video_name = "live_stream" if isinstance(video_source, int) else Path(video_path).stem
-        csv_filename = OUTPUT_DIR / f"{video_name}_lane_counts.csv"
-        lane_manager.export_to_csv(str(csv_filename))
+        csv_filename = OUTPUT_DIR / f"{video_name}_signal_logs.csv"
+        export_signal_history_to_csv(signal_history, str(csv_filename))
 
     return {
         "avg_fps": avg_fps,
         "avg_inference_ms": avg_inf,
-        "counts": cum_counts,
-        "frame_count": frame_count
+        "frame_count": frame_count,
+        "final_lane": signal_controller.current_green_lane,
+        "final_state": signal_controller.signal_state
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Modular lane-based vehicle detection and tracking")
+    parser = argparse.ArgumentParser(description="Adaptive signal control with density classification")
     parser.add_argument("--video", required=True, help="Path to video file or camera index (e.g. '0')")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="Path to YOLO model weights")
     parser.add_argument("--show", action="store_true", help="Display live preview screen")
     parser.add_argument("--save", action="store_true", help="Save annotated output video")
-    parser.add_argument("--export-csv", action="store_true", help="Export lane logs to CSV")
+    parser.add_argument("--export-csv", action="store_true", help="Export signal logs to CSV")
     args = parser.parse_args()
 
-    run_lane_pipeline(
+    run_signal_pipeline(
         video_path=args.video,
         model_path=args.model,
         show=args.show,

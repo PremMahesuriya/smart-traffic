@@ -45,3 +45,7 @@ docker/data/
 coverage/
 htmlcov/
 .pytest_cache/
+
+# Large Model Weights and Video Outputs
+*.pt
+output/

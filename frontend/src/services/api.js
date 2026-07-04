@@ -1,41 +1,45 @@
-const API_BASE = '/api';
+import axios from 'axios';
 
-export async function fetchTraffic() {
-  const res = await fetch(`${API_BASE}/traffic`);
-  if (!res.ok) throw new Error('Failed to fetch traffic');
-  return res.json();
-}
+// Define the Express backend REST API base URL
+const API_BASE_URL = 'http://localhost:5000/api';
 
-export async function fetchSignals() {
-  const res = await fetch(`${API_BASE}/signals`);
-  if (!res.ok) throw new Error('Failed to fetch signals');
-  return res.json();
-}
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 5000, // 5s timeout
+});
 
-export async function fetchAnalytics() {
-  const res = await fetch(`${API_BASE}/analytics`);
-  if (!res.ok) throw new Error('Failed to fetch analytics');
-  return res.json();
-}
+export const apiService = {
+  // 1. Health check
+  healthCheck: async () => {
+    const response = await apiClient.get('/health');
+    return response.data;
+  },
 
-export async function fetchCameras() {
-  const res = await fetch(`${API_BASE}/cameras`);
-  if (!res.ok) throw new Error('Failed to fetch cameras');
-  return res.json();
-}
+  // 2. Traffic APIs
+  getCurrentTraffic: async () => {
+    const response = await apiClient.get('/traffic/current');
+    return response.data;
+  },
 
-export async function fetchAccidents() {
-  const res = await fetch(`${API_BASE}/accidents`);
-  if (!res.ok) throw new Error('Failed to fetch accidents');
-  return res.json();
-}
+  getTrafficHistory: async () => {
+    const response = await apiClient.get('/traffic/history');
+    return response.data;
+  },
 
-export async function updateSignal(data) {
-  const res = await fetch(`${API_BASE}/signal`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error('Failed to update signal');
-  return res.json();
-}
+  getTrafficAnalytics: async () => {
+    const response = await apiClient.get('/traffic/analytics');
+    return response.data;
+  },
+
+  // 3. Signal APIs
+  getCurrentSignal: async () => {
+    const response = await apiClient.get('/signals/current');
+    return response.data;
+  },
+
+  getSignalHistory: async () => {
+    const response = await apiClient.get('/signals/history');
+    return response.data;
+  },
+};
+export default apiService;

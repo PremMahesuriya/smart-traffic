@@ -8,14 +8,14 @@ Traditional fixed-time traffic signals cause unnecessary wait times during low t
 
 ## 2. Goals
 
-- [ ] Accurate vehicle detection and classification (car, bus, truck, bike)
-- [ ] Per-lane vehicle counting
-- [ ] Traffic density classification (Low / Medium / High / Very High)
-- [ ] Dynamic green-light duration based on queue length
+- [x] Accurate vehicle detection and classification (car, bus, truck, bike)
+- [x] Per-lane vehicle counting
+- [x] Traffic density classification (Low / Medium / High / Very High)
+- [x] Dynamic green-light duration based on queue length
 - [ ] Emergency vehicle priority (ambulance, fire truck, police)
 - [ ] Accident detection with automated alerts
 - [ ] Short-term traffic prediction (10 min, 30 min, 1 hour)
-- [ ] Real-time dashboard for operators and admins
+- [x] Real-time dashboard for operators and admins
 
 ## 3. Functional Requirements
 
@@ -125,13 +125,16 @@ Camera Feed → AI Pipeline → Backend API → MongoDB
 <!-- Key findings from ITS literature -->
 
 ### Computer Vision in Traffic Monitoring
-<!-- Relevant papers, tools, and approaches -->
+Using deep learning detectors like YOLOv8 (specifically yolov8n for edge computing) paired with persistent tracking frameworks like ByteTrack or BoT-SORT allows for the continuous monitoring of vehicles. By tracking individual vehicle centroids and evaluating their coordinates against a counting line, we establish unique crossing logs and eliminate double counting.
 
 ### Adaptive Traffic Control
 <!-- Algorithms: SCATS, SCOOT, etc. -->
 
 ## 8. Open Questions
 
-- [ ] Which YOLO version / model size for edge deployment?
-- [ ] Single intersection or multi-intersection support?
-- [ ] Real camera hardware or simulated feeds for demo?
+- [x] Which YOLO version / model size for edge deployment?
+  - *Recommendation:* YOLOv8n (nano) or YOLOv8s (small) is ideal, offering ~3.2M parameters to run at 30+ FPS on edge units (e.g. Jetson Orin Nano, CPU servers).
+- [x] Single intersection or multi-intersection support?
+  - *Recommendation:* The system is designed to process individual camera channels per lane or approach, allowing easy horizontal scaling to multi-intersection coordination at the backend.
+- [x] Real camera hardware or simulated feeds for demo?
+  - *Recommendation:* Supported programmatically via local webcam indices, RTSP network feeds, and synthetic/simulated traffic videos.
