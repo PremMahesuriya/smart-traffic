@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Traffic Management System — Portal</title>
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #0f172a;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --accent-green: #22c55e;
+      --accent-yellow: #eab308;
+      --accent-red: #ef4444;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(51, 65, 85, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      text-align: center;
+    }
+
+    header {
+      margin-bottom: 3.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.3);
+      color: #38bdf8;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Portal Grid Layout */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    /* Glassmorphic Portal Cards */
+    .portal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-align: left;
+      text-decoration: none;
+      color: var(--text);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(2, 132, 199, 0.5);
+      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.15);
+      background: rgba(30, 41, 59, 0.9);
+    }
+
+    .card-icon {
+      font-size: 2.25rem;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #ffffff;
+    }
+
+    .card-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #38bdf8;
+      transition: gap 0.2s ease;
+    }
+
+    .portal-card:hover .card-btn {
+      gap: 0.75rem;
+    }
+
+    /* Flow Section */
+    .flow-section {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(51, 65, 85, 0.4);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      margin-top: 1rem;
+    }
+
+    .flow-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .steps-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .step-item {
+      flex: 1;
+      min-width: 140px;
+      position: relative;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      background: rgba(2, 132, 199, 0.15);
+      border: 2px solid var(--primary);
+      color: #38bdf8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 0 auto 0.75rem;
+    }
+
+    .step-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    footer {
+      margin-top: 5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.3);
+      padding-top: 1.5rem;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.25rem;
+      }
+      .steps-container {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .step-item::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">System Hub Portal</div>
+      <h1>Smart Traffic Management</h1>
+      <p class="subtitle">An orchestrated Computer Vision and Adaptive Light Signal Controller optimized for real-time intersection throughput.</p>
+    </header>
+
+    <!-- Portal Cards Grid -->
+    <div class="portal-grid">
+      <!-- Card 1: Dashboard UI -->
+      <a href="http://localhost:5173" class="portal-card" target="_blank">
+        <span class="card-icon">📊</span>
+        <h3 class="card-title">Operator Dashboard</h3>
+        <p class="card-desc">Access the real-time visual dashboard showing counts, current lane status, light countdowns, and historical metrics charts.</p>
+        <span class="card-btn">Open Dashboard &rarr;</span>
+      </a>
+
+      <!-- Card 2: Express API Endpoint -->
+      <a href="http://localhost:5000/api/health" class="portal-card" target="_blank">
+        <span class="card-icon">⚡</span>
+        <h3 class="card-title">REST API Services</h3>
+        <p class="card-desc">Query backend API services and verify database synchronization, endpoint health responses, and system logs.</p>
+        <span class="card-btn">Check API Status &rarr;</span>
+      </a>
+
+      <!-- Card 3: Code Documentation -->
+      <a href="https://github.com/PremMahesuriya/smart-traffic#readme" class="portal-card" target="_blank">
+        <span class="card-icon">📖</span>
+        <h3 class="card-title">Project Documentation</h3>
+        <p class="card-desc">Browse local README documentation detailing algorithms, database schemas, directory layouts, and execution parameters.</p>
+        <span class="card-btn">View Code Docs &rarr;</span>
+      </a>
+    </div>
+
+    <!-- Data Flow Pipeline Overview -->
+    <div class="flow-section">
+      <h2 class="flow-title">Integrated Pipeline Flow</h2>
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-label">CV Tracking</div>
+          <div class="step-sub">YOLOv8 + ByteTrack</div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-label">Lane Occupancy</div>
+          <div class="step-sub">Polygon Mapping</div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-label">Adaptive Score</div>
+          <div class="step-sub">Priority Ageing</div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-label">JSON REST Post</div>
+          <div class="step-sub">Express + MongoDB</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Smart Traffic Management System. Created for final release.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
