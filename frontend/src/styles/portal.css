@@ -1,0 +1,376 @@
+/* Portal Landing Page Stylesheet - Premium Dark Theme */
+
+.portal-body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #0f172a;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.portal-container {
+  max-width: 1100px;
+  width: 100%;
+  text-align: center;
+}
+
+.portal-header {
+  margin-bottom: 4rem;
+}
+
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(2, 132, 199, 0.15);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  color: #38bdf8;
+  padding: 0.6rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(2, 132, 199, 0.1);
+}
+
+.portal-badge .badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  animation: pulse 2s infinite;
+}
+
+.portal-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.portal-subtitle {
+  font-size: 1.25rem;
+  color: #94a3b8;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Portal Grid Layout */
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4.5rem;
+}
+
+/* Glassmorphic Portal Cards */
+.portal-card {
+  background: rgba(30, 41, 59, 0.45);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 24px;
+  padding: 3rem 2.25rem;
+  text-align: left;
+  text-decoration: none;
+  color: #f8fafc;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.portal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.portal-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(2, 132, 199, 0.5);
+  box-shadow: 0 20px 40px rgba(2, 132, 199, 0.15);
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.portal-card:hover::before {
+  opacity: 1;
+}
+
+.portal-card-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.portal-card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+.portal-card-desc {
+  font-size: 0.975rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.portal-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #38bdf8;
+  transition: gap 0.2s ease;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.portal-card:hover .portal-card-btn {
+  gap: 0.75rem;
+  color: #0284c7;
+}
+
+/* Dynamic Connection status widget on card */
+.portal-card-status {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px;
+  z-index: 2;
+}
+
+.portal-card-status.online {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.portal-card-status.offline {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.portal-card-status .status-circle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Flow Section */
+.portal-flow-section {
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(51, 65, 85, 0.4);
+  border-radius: 28px;
+  padding: 3.5rem 2.5rem;
+  margin-top: 1.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.portal-flow-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  letter-spacing: -0.015em;
+  background: linear-gradient(135deg, #ffffff 60%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.portal-steps-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* Custom Connection Line Animation */
+.portal-steps-container::before {
+  content: '';
+  position: absolute;
+  top: 30px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    #0284c7 0%, 
+    #a855f7 33%, 
+    #eab308 66%, 
+    #22c55e 100%
+  );
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* Scanning Light Overlay */
+.portal-steps-container::after {
+  content: '';
+  position: absolute;
+  top: 29px;
+  left: 10%;
+  width: 80%;
+  height: 4px;
+  background: radial-gradient(circle, #38bdf8 0%, transparent 60%);
+  z-index: 1;
+  animation: flowLight 4s linear infinite;
+  opacity: 0.7;
+}
+
+.portal-step-item {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.portal-step-number {
+  width: 60px;
+  height: 60px;
+  background: #1e293b;
+  border: 3px solid #334155;
+  color: #94a3b8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.portal-step-item:hover .portal-step-number {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+}
+
+/* Coloring steps differently */
+.portal-step-item:nth-child(1) .portal-step-number { border-color: rgba(2, 132, 199, 0.6); color: #38bdf8; }
+.portal-step-item:nth-child(2) .portal-step-number { border-color: rgba(168, 85, 247, 0.6); color: #c084fc; }
+.portal-step-item:nth-child(3) .portal-step-number { border-color: rgba(234, 179, 8, 0.6); color: #fde047; }
+.portal-step-item:nth-child(4) .portal-step-number { border-color: rgba(34, 197, 94, 0.6); color: #4ade80; }
+
+.portal-step-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.portal-step-sub {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.portal-footer {
+  margin-top: 6rem;
+  padding-top: 2rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.4;
+  }
+}
+
+@keyframes flowLight {
+  0% {
+    transform: translateX(-5%);
+  }
+  100% {
+    transform: translateX(105%);
+  }
+}
+
+/* Responsive Overrides */
+@media (max-width: 868px) {
+  .portal-title {
+    font-size: 2.75rem;
+  }
+  .portal-steps-container {
+    flex-direction: column;
+    gap: 3rem;
+    align-items: center;
+  }
+  .portal-steps-container::before,
+  .portal-steps-container::after {
+    display: none;
+  }
+  .portal-step-item {
+    width: 100%;
+  }
+}

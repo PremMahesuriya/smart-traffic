@@ -1,13 +1,18 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="logo-container">
-        <h1 className="logo">Smart Traffic</h1>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <h1 className="logo">Smart Traffic</h1>
+        </Link>
       </div>
       <nav className="nav-links">
         <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} end>
+          Portal Home
+        </NavLink>
+        <NavLink to="/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
           Dashboard
         </NavLink>
         <NavLink to="/traffic" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
